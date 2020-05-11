@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const receiveImage = require('../middlewares/multerMiddleware');
-const { uploadImage } = require('../utils/cloudinaryUtil');
+const { uploadImage, getResized } = require('../utils/cloudinaryUtil');
 
 router.post('/upload', (req, res) => {
     receiveImage(req, res, async (err) => {
@@ -16,9 +16,11 @@ router.post('/upload', (req, res) => {
             const imageName = new Date().getTime().toString();
 
             const uploadResult = await uploadImage(imageStream, imageName);
+            //creating url for resized image
+            const urlMin = getResized(imageName);
 
             const uploadedUrl = uploadResult.url;
-            return res.json({ url: uploadedUrl });
+            return res.json({ url: uploadedUrl, url_min: urlMin });
         } catch (error) {
             return res.json({ error: 'Failed to upload' });
         }
